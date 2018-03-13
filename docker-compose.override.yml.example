@@ -1,0 +1,8 @@
+version: "2.1"
+services:
+  node:
+    command: "nodemon ."
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/data

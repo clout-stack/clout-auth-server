@@ -32,3 +32,9 @@ dist
 
 .DS_Store
 dump.rdb
+
+# ENV Files
+.env
+
+# Docker files
+docker-compose.override.yml

@@ -17,9 +17,13 @@ module.exports = {
 		fn: function (next) {
 			let cloutWebpack = new CloutWebpack(this);
 			console.log('building webpack');
+
 			cloutWebpack.startHook()
 				.then(() => next())
-				.catch((error) => next(error));
+				.catch((error) => {
+					console.log(error);
+					next(error)
+				});
 		}
 	}
 };
@@ -68,6 +72,7 @@ class CloutWebpack {
 
 						this.onCompilerWatch(err, stats);
 					});
+					break;
 			}
 		})
 		.then(() => {

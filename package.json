@@ -1,7 +1,7 @@
 {
-  "name": "clout-tech-web",
+  "name": "clout-auth-server",
   "version": "1.0.0",
-  "description": "Web application for clout.tech",
+  "description": "Web application for auth.clout.tech",
   "main": "app.js",
   "scripts": {
     "start": "node .",
@@ -17,12 +17,17 @@
   "engines": {
     "node": ">=v6.0.0"
   },
+  "modules": [
+    "clout-sequelize",
+    "clout-swagger"
+  ],
   "author": "Muhammad Dadu",
   "license": "ISC",
   "dependencies": {
     "async": "^2.6.0",
-    "clout-js": "^2.0.0-beta.2",
+    "clout-sequelize": "^0.0.2",
     "debug": "^3.1.0",
+    "express": "^4.16.2",
     "lodash": "^4.6.1",
     "node-mailjet": "^3.2.1"
   },
