@@ -1,8 +1,7 @@
 version: "2.1"
 services:
   node:
-    command: "nodemon ."
+    command: "nodemon . --ignore data --ignore logs --ignore dist --ignore src"
     volumes:
       - ./:/usr/src/app
       - /usr/src/app/node_modules
-      - /usr/src/app/data

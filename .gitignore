@@ -38,3 +38,4 @@ dump.rdb
 
 # Docker files
 docker-compose.override.yml
+data

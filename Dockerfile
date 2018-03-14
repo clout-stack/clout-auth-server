@@ -13,12 +13,10 @@ RUN npm install -g nodemon
 # Create app directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
-COPY package.json ./
-
-RUN npm install
-
 COPY . .
+
+# Install app dependencies
+RUN npm install
 
 EXPOSE 80
 ENV HOSTNAME=0.0.0.0

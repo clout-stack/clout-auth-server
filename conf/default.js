@@ -3,14 +3,10 @@
  */
 module.exports = {
 	session: {
-		secret: '<SESSION_SECRET>'
+		secret: process.env.SESSION_SECRET
 	},
-	partners: {
-		mailjet: {
-			public_key: '',
-			private_key: '',
-			defaultEmail: '',
-			defaultName: 'Clout Tech'
-		},
-	},
+	jwt: {
+		secret: process.env.JWT_SECRET_KEY,
+		expire: process.env.JWT_EXPIRES_IN
+	}
 };
