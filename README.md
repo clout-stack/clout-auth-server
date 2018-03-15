@@ -1,5 +1,7 @@
 # Clout Auth Server
 
+> A simple plug and play Node micro-service to provide an authentication layer for any project.
+
 ## Docker
 
 ### Running this locally

@@ -1,7 +1,7 @@
 {
   "name": "clout-auth-server",
   "version": "1.0.0",
-  "description": "Web application for auth.clout.tech",
+  "description": "Clout Authentication Micro Service",
   "main": "app.js",
   "scripts": {
     "start": "node .",

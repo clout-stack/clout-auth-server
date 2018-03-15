@@ -93,12 +93,13 @@ class CloutWebpack {
 
 	createJSAPIMap() {
 		let jsAPIMap = {};
+		let routes = this.clout.core.api.routes;
 
-		Object.keys(this.clout.core.api.routes).forEach((key) => {
-			let routes = this.clout.core.api.routes[key];
+		Object.keys(routes).forEach((key) => {
+			let paths = routes[key];
 			jsAPIMap[key] = {};
 
-			routes.forEach((route) => {
+			paths.forEach((route) => {
 				jsAPIMap[key][route.name] = {
 					path: route.path,
 					methods: route.methods,
