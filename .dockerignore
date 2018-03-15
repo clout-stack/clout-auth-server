@@ -1,10 +1,10 @@
 # Node
-
 node_modules
 npm-debug.log
 .git
 logs
 
-
+# Docker
+dist
 docker-*
 Dockerfile

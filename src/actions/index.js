@@ -2,6 +2,8 @@ import headerActions from '../components/header/header.action';
 
 import api from '../api';
 
+global.api = api;
+
 function createAction(actionType) {
     return data => {
         let action = {type: actionType};

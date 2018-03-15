@@ -10,13 +10,15 @@ RUN yarn global add npm@lts
 RUN npm install -g sequelize-cli
 RUN npm install -g nodemon
 
+# Install app dependencies
+RUN mkdir /usr/src/app
+COPY package.json /usr/src/app/package.json
+RUN cd /usr/src/app && npm install
+
 # Create app directory
 WORKDIR /usr/src/app
 
 COPY . .
-
-# Install app dependencies
-RUN npm install
 
 EXPOSE 80
 ENV HOSTNAME=0.0.0.0

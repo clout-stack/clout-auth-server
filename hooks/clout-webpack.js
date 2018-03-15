@@ -42,10 +42,15 @@ class CloutWebpack {
 
 	startHook() {
 		let webpackConfig = this.clout.config.webpack;
+		let jsApiMap = this.createJSAPIMap();
 
 		if (!webpackConfig) {
 			return Promise.reject(`webpack config not found`);
 		}
+
+		webpackConfig.plugins.push(new webpack.DefinePlugin({
+			"cloutApiMap": JSON.stringify(jsApiMap)
+		}));
 
 		this.compiler = webpack(webpackConfig);
 
@@ -76,10 +81,33 @@ class CloutWebpack {
 			}
 		})
 		.then(() => {
+			if (this.clout.config.env === 'development') {
+				this.clout.app.use(require("webpack-hot-middleware")(this.compiler));
+			}
+
 			this.clout.app.use(express.static(this.compiler.outputPath));
 			// TODO:- create router for the react. Tap-into react router? bridge webpack and set paths?
 			// this.clout.app.use('*', express.static(this.compiler.outputPath));
 		});
+	}
+
+	createJSAPIMap() {
+		let jsAPIMap = {};
+
+		Object.keys(this.clout.core.api.routes).forEach((key) => {
+			let routes = this.clout.core.api.routes[key];
+			jsAPIMap[key] = {};
+
+			routes.forEach((route) => {
+				jsAPIMap[key][route.name] = {
+					path: route.path,
+					methods: route.methods,
+					params: route.params
+				};
+			});
+		});
+
+		return jsAPIMap;
 	}
 
 	onCompilerError(err) {

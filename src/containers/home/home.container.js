@@ -2,7 +2,6 @@
  * Home Page
  */
 import React from 'react';
-import {store} from '../../main';
 
 import {connect} from 'react-redux';
 import {setStyle, toggleInfo} from '../../actions';

@@ -11,6 +11,6 @@ module.exports = {
 
         },
         /** Load all strategies */
-        useDefault: true,
+        useDefault: true
     }
 };
