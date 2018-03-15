@@ -1,4 +1,4 @@
-# Clout Auth Server
+# Clout Auth Server [![Build Status](https://travis-ci.org/clout-stack/clout-auth-server.svg?branch=master)](https://travis-ci.org/clout-stack/clout-auth-server)
 
 > A simple plug and play Node micro-service to provide an authentication layer for any project.
 
