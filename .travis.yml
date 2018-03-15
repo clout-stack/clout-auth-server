@@ -9,4 +9,4 @@ before_install:
   - docker-compose build node
 
 script:
-  - docker-compose run node npm run test
+  - eval $(egrep -v '^#' .env | xargs) docker-compose run node npm run test
