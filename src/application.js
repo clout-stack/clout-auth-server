@@ -2,4 +2,4 @@
  * Management Application
  */
 
-import './style/authentication.scss';
+import './style/application.scss';

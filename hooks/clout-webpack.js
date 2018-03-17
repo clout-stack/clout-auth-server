@@ -15,13 +15,13 @@ module.exports = {
 		event: 'start',
 		priority: 'CONTROLLER',
 		fn: function (next) {
-			let cloutWebpack = new CloutWebpack(this);
-			console.log('building webpack');
+			this.cloutWebpack = new CloutWebpack(this);
+			this.logger.info('building webpack');
 
-			cloutWebpack.startHook()
+			this.cloutWebpack.startHook()
 				.then(() => next())
 				.catch((error) => {
-					console.log(error);
+					this.logger.error(error);
 					next(error)
 				});
 		}
@@ -42,7 +42,8 @@ class CloutWebpack {
 
 	startHook() {
 		let webpackConfig = this.clout.config.webpack;
-		let jsApiMap = this.createJSAPIMap();
+		let jsApiMap = this.getJSAPIMap();
+		let buildAction;
 
 		if (!webpackConfig) {
 			return Promise.reject(`webpack config not found`);
@@ -54,44 +55,45 @@ class CloutWebpack {
 
 		this.compiler = webpack(webpackConfig);
 
+		if (this.hasRunOnce) {
+			buildAction = () => Promise.reject('cannot start hook again, already running');
+		} else if (this.clout.config.env === 'production') {
+			buildAction = () => this.build();
+		} else {
+			buildAction = () => this.watch();
+		}
+
+		return buildAction()
+			.then(({ durationInMS, duration }) => {
+				this.clout.logger.info('successfully build webpack');
+				this.clout.logger.info(`duration: ${duration}s`);
+			})
+			.then(() => {
+				if (this.clout.config.env === 'development') {
+					this.clout.app.use(require("webpack-hot-middleware")(this.compiler));
+				}
+
+				this.clout.app.use(express.static(this.compiler.outputPath));
+			});
+	}
+
+	build() {
 		return new Promise((resolve, reject) => {
-			switch (this.clout.config.env) {
-				case 'production':
-					return this.compiler.run((err, stats) => {
-						if (!this.hasRunOnce) {
-							this.hasRunOnce = true;
-							if (err) { return reject(err); }
-							resolve();
-						}
-
-						this.onCompilerRun(err, stats);
-					});
-					break;
-				default:
-					return this.compiler.watch(COMPILER_WATCH_OPTIONS, (err, stats) => {
-						if (!this.hasRunOnce) {
-							this.hasRunOnce = true;
-							if (err) { return reject(err); }
-							resolve();
-						}
-
-						this.onCompilerWatch(err, stats);
-					});
-					break;
-			}
-		})
-		.then(() => {
-			if (this.clout.config.env === 'development') {
-				this.clout.app.use(require("webpack-hot-middleware")(this.compiler));
-			}
-
-			this.clout.app.use(express.static(this.compiler.outputPath));
-			// TODO:- create router for the react. Tap-into react router? bridge webpack and set paths?
-			// this.clout.app.use('*', express.static(this.compiler.outputPath));
+			this.compiler.run((err, stats) => {
+				this.onCompilerRun(err, stats).then(resolve).catch(reject);
+			});
 		});
 	}
 
-	createJSAPIMap() {
+	watch() {
+		return new Promise((resolve, reject) => {
+			return this.compiler.watch(COMPILER_WATCH_OPTIONS, (err, stats) => {
+				this.onCompilerWatch(err, stats).then(resolve).catch(reject);
+			});
+		});
+	}
+
+	getJSAPIMap() {
 		let jsAPIMap = {};
 		let routes = this.clout.core.api.routes;
 
@@ -112,23 +114,23 @@ class CloutWebpack {
 	}
 
 	onCompilerError(err) {
-		console.error(err);
+		this.clout.logger.error(err);
 	}
 
 	onCompilerSuccess(stats) {
 		let durationInMS = stats.endTime - stats.startTime;
 		let duration = durationInMS / 1000;
-		console.info('successfully build webpack');
-		console.info(`duration: ${duration}s`);
+
+		return Promise.resolve({ durationInMS, duration });
 	}
 
 	onCompilerWatch(err, stats) {
-		if (err) { this.onCompilerError(err); }
-		this.onCompilerSuccess(stats);
+		if (err) { return this.onCompilerError(err); }
+		return this.onCompilerSuccess(stats);
 	}
 
 	onCompilerRun(err, stats) {
-		if (err) { this.onCompilerError(err); }
-		this.onCompilerSuccess(stats);
+		if (err) { return this.onCompilerError(err); }
+		return this.onCompilerSuccess(stats);
 	}
 };
