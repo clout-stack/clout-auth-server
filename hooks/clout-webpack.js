@@ -9,6 +9,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const {merge} = require('lodash');
+const webpackHotMiddleware = require('webpack-hot-middleware');
 
 module.exports = {
 	webpack: {
@@ -70,7 +71,10 @@ class CloutWebpack {
 			})
 			.then(() => {
 				if (this.clout.config.env === 'development') {
-					this.clout.app.use(require("webpack-hot-middleware")(this.compiler));
+					this.clout.app.use(webpackHotMiddleware(this.compiler, {
+						publicPath: this.compiler.outputPath,
+						path: '/'
+					}));
 				}
 
 				this.clout.app.use(express.static(this.compiler.outputPath));
