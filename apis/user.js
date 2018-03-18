@@ -7,20 +7,30 @@ module.exports = {
 		path: '/user',
 		description: 'write description please',
 		fn(req, resp, next) {
-			resp.ok([
-				{firstName: 'Muhammad', lastName: 'Dadu'}
-			]);
+			let { User } = this.models;
+			let query = {};
+
+			return User.find(query)
+				.then((data) => resp.ok(data))
+				.catch((err) => resp.error(err));
 		}
 	},
-	getById: {
+	getByUsername: {
 		method: 'get',
-		path: '/user/:id',
+		path: '/user/:username',
 		description: 'write description please',
 		fn(req, resp, next) {
-			resp.ok();
+			let { User } = this.models;
+			let query = {
+				username: req.params.username
+			};
+
+			return User.findOne(query)
+				.then((data) => resp.ok(data))
+				.catch((err) => resp.error(err));
 		}
 	},
-	create: {
+	register: {
 		method: 'put',
 		path: '/user',
 		description: 'write description please',
@@ -33,7 +43,22 @@ module.exports = {
 		path: '/user/login',
 		description: 'write description please',
 		fn(req, resp, next) {
-			resp.ok();
+			passport.authenticate('local', (err, user, info) => {
+				if (err) { 
+					return resp.error(err);
+				}
+
+				if (!user) {
+					return resp.notAuthorized('supplied credentials are invalid');
+				}
+
+				req.logIn(user, function (err) {
+					if (err) {
+						return resp.error(err);
+					}
+					return res.redirect('/apis/users/' + user.username);
+				});
+			})(req, resp, next);
 		}
 	},
 	logout: {
@@ -41,6 +66,7 @@ module.exports = {
 		path: '/user/login',
 		description: 'write description please',
 		fn(req, resp, next) {
+			req.logout();
 			resp.ok();
 		}
 	},
@@ -49,7 +75,11 @@ module.exports = {
 		path: '/user/whoami',
 		description: 'write description please',
 		fn(req, resp, next) {
-			resp.ok();
+			if (!req.user) {
+				return resp.notAuthorized('user is not authorized');
+			}
+
+			return res.redirect('/apis/users/' + req.user.username);
 		}
 	},
 };

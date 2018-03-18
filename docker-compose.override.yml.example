@@ -3,5 +3,6 @@ services:
   node:
     command: "nodemon . --ignore data --ignore logs --ignore dist --ignore src"
     volumes:
-      - ./:/usr/src/app
+      - .:/usr/src/app
       - /usr/src/app/node_modules
+
