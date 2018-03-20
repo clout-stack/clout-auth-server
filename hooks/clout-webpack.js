@@ -51,10 +51,18 @@ class CloutWebpack {
 		}
 
 		webpackConfig.plugins.push(new webpack.DefinePlugin({
-			"cloutApiMap": JSON.stringify(jsApiMap)
+			cloutApiMap: JSON.stringify(jsApiMap)
 		}));
 
 		this.compiler = webpack(webpackConfig);
+
+		if (this.clout.config.env === 'development') {
+			this.clout.app.use(webpackHotMiddleware(this.compiler, {
+				publicPath: this.compiler.outputPath
+			}));
+		}
+
+		this.clout.app.use(express.static(this.compiler.outputPath));
 
 		if (this.hasRunOnce) {
 			buildAction = () => Promise.reject('cannot start hook again, already running');
@@ -68,16 +76,6 @@ class CloutWebpack {
 			.then(({ durationInMS, duration }) => {
 				this.clout.logger.info('successfully build webpack');
 				this.clout.logger.info(`duration: ${duration}s`);
-			})
-			.then(() => {
-				if (this.clout.config.env === 'development') {
-					this.clout.app.use(webpackHotMiddleware(this.compiler, {
-						publicPath: this.compiler.outputPath,
-						path: '/'
-					}));
-				}
-
-				this.clout.app.use(express.static(this.compiler.outputPath));
 			});
 	}
 
